@@ -1,0 +1,52 @@
+import panda as pd     #install all in settings below
+from bs4 import BeautifulSoup
+from selenium import webdriver
+from selenium.webdriver.chrome.service import Service
+
+# create a driver instance (need to download and replace with your folder link)
+s=Service("C:\\Users\\Michael\\Downloads\\chromedriver_win32\\chromedriver.exe")
+driver = webdriver.Chrome(service=s)
+
+# open the url
+driver.get('https://westportlibrary.libguides.com/NYTimesbestsellers/newyorktimesbestsellers')
+
+# get the html page
+content = driver.page_source
+html_page = driver.page_source
+
+# create a soup object
+soup = BeautifulSoup(html_page,'html.parser')
+
+# find spans with class attribute name and s-lg-book-title value
+title_elements = soup.find_all('span', class_ = 's-lg-book-title')
+
+# find spans with class attribute name and s-lg-book-author value
+author_elements = soup.find_all('span', class_ = 's-lg-book-author')
+
+# find spans with class attribute name and s-lg-book-desc value
+summ_elements = soup.find_all('div', class_ = 's-lg-book-desc')
+
+# create lists
+title_list = []
+author_list = []
+summary_list= []
+
+# iterate over the elements and get text
+for title in title_elements:
+    title_list.append(title.text)
+
+for author in author_elements:
+    author_list.append(author.text)
+
+for desc in summ_elements:
+    summary_list.append(desc.text)
+
+# create a dataframe
+df = pd.DataFrame({'Books':title_list, 'Authors':author_list, 'Summaries':summary_list})
+
+# export to the csv file
+df.to_csv('2023-book-list.csv', index=False, encoding='utf-8')
+print(title_list)
+
+# close the driver
+driver.close()
